@@ -74,6 +74,7 @@ def identify():
 			division(value.get(),10,8)
 
 	elif dhbo1.get() == "B1":
+		# This entire section is correct
 		for x in binary_not:
 			if x in str(value.get()):
 				errorlevel+=1
@@ -93,18 +94,23 @@ def identify():
 				similarity(value.get(),2,8)
 
 	elif dhbo1.get() == "H1":
-		if dhbo2.get() == "B2":
-			hex_or_oct = "hex"
-			base_checker(16,2)
-			hex_or_oct = "hex"
-			value2 = bin(int(val.get(), 16))[2:]
-			similarity(value2,16,2)
-		elif dhbo2.get() == "D2":
-			base_checker(16,10)
-			multiply(val.get(),16,10)
-		elif dhbo2.get() == "O2":
-			base_checker(16,10)
-			multiply(val.get(),16,10)
+		# Location
+		if all(hexa in hexadecimal for hexa in val.get()): # all(iterable) returns True if the condition is met & vice versa
+			if dhbo2.get() == "B2":
+				hex_or_oct = "hex"
+				base_checker(16,2)
+				hex_or_oct = "hex"
+				value2 = bin(int(val.get(), 16))[2:]
+				similarity(value2,16,2)
+				hex_or_oct=None
+			elif dhbo2.get() == "D2":
+				base_checker(16,10)
+				multiply(val.get(),16,10)
+			elif dhbo2.get() == "O2":
+				base_checker(16,10)
+				multiply(val.get(),16,10)
+		else:
+			tmsg.showerror("Error","Hexadecimal values can only contain digits (0-9) and letters (A-F)")
 
 	elif dhbo1.get() == "O1":
 		for x in octal_not:
@@ -115,22 +121,26 @@ def identify():
 		if errorlevel>0:
 			tmsg.showerror('Error',"Octal only supports number from 0 to 7")
 		else:
-			if dhbo2.get() == "D2":
+			if dhbo2.get() == "D2": # Correct
 				base_checker(8,10)
 				multiply(value.get(),8,10)
-			elif dhbo2.get() == "B2":
+			elif dhbo2.get() == "B2": # Correct
 				hex_or_oct="oct"
 				base_checker(8,2)
 				hex_or_oct = "oct"
-				val = str(value.get())
-				value2 = bin(int(val, 8))[2:]
+				val2 = str(value.get()) # Changes
+				value2 = bin(int(val2, 8))[2:] # Changes
 				similarity(value2,8,2)
-			elif dhbo2.get() == "H2":
+				hex_or_oct=None
+			elif dhbo2.get() == "H2": # Correct
 				base_checker(8,10)
 				multiply(value.get(),8,10)
 
 	else:
 		tmsg.showerror('Error','Invalid Options Selected')
+
+	if dhbo1.get()[0]==dhbo2.get()[0]:
+		tmsg.showerror("Error","Both Options Cannot Be The Same")
 
 def multiply(v,b,s_b):
 	global power_in_use,powers,text1,base_in_use,bases,answer_text,sec_base_in_use,h_o_conversion
