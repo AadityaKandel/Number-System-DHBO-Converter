@@ -27,6 +27,8 @@ base_in_use = ''
 sec_base_in_use = ''
 answer_text = ''
 h_o_conversion = ''
+fraction_ans_text=''
+ans_by_fraction_multiply=""
 
 
 numerical_hex=['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']
@@ -128,7 +130,7 @@ def identify():
                 base_checker(16,10)
                 multiply(val.get(),16,10)
             elif dhbo2.get() == "O2":
-                mul_or_sim=False
+                mul_or_sim=True
                 base_checker(16,10)
                 multiply(val.get(),16,10)
         else:
@@ -163,7 +165,7 @@ def identify():
                 str_v=0.0
                 hex_or_oct=None
             elif dhbo2.get() == "H2": # Correct
-                mul_or_sim=False
+                mul_or_sim=True
                 base_checker(8,10)
                 multiply(value.get(),8,10)
 
@@ -187,9 +189,8 @@ def initialize_fraction(value):
         return value
 
 def multiply(v,b,s_b):
-    global power_in_use,powers,text1,base_in_use,bases,answer_text,sec_base_in_use,h_o_conversion,str_v
+    global power_in_use,powers,text1,base_in_use,bases,answer_text,sec_base_in_use,h_o_conversion,str_v,fraction_ans_text,mul_or_sim,ans_by_fraction_multiply
     str_v=0.0
-
     if b==16:
         v=(initialize_fraction(v))
     else:
@@ -271,25 +272,48 @@ def multiply(v,b,s_b):
         answer_text+=f'\n\tHence, ({str_v1}){base_in_use} = ({f1}){sec_base_in_use}'
     h_text = 'To convert Hexadecimal to Octal, We first need to convert Hexa into Decimal,\n'
     o_text="To convert Octal to Hexadecimal, We first need to convert Octal into Decimal,\n"
+
+    rare_condition=((dhbo1.get()!="O1" and dhbo2.get()!="H2") and (dhbo1.get()!="H1" and dhbo2.get()!="O2"))
+
+    if str_v>0 and mul_or_sim==True and rare_condition:
+        if str_v==1.1234567890:
+            str_v=val.get()
+            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
+            f1=ans_by_fraction_multiply
+        else:
+            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
+            f1=ans_by_fraction_multiply
+        area.delete(1.0,END)
+        area.insert(END,answer_text+fraction_ans_text)
+        return
+    else:
+        fraction_ans_text=''
+
+    if str_v>0 and mul_or_sim==True and rare_condition==False:
+        if str_v==1.1234567890:
+            str_v=val.get()
+            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
+            f1=ans_by_fraction_multiply
+        else:
+            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
+            f1=ans_by_fraction_multiply
+        area.insert(END,fraction_ans_text)
+    else:
+        fraction_ans_text=''
+
     if dhbo1.get()=="O1" and dhbo2.get()=="H2":
-        h_o_conversion = o_text+answer_text
+        h_o_conversion = o_text+answer_text+'\n'+fraction_ans_text+'\n'
         base_checker(10,16)
+        mul_or_sim=True
         division(f1,10,16)
     elif dhbo1.get()=="H1" and dhbo2.get()=="O2":
-        h_o_conversion = h_text+answer_text
+        h_o_conversion = h_text+answer_text+'\n'+fraction_ans_text+'\n'
         base_checker(10,8)
+        mul_or_sim=True
         division(f1,10,8)
     else:
         area.delete(1.0,END)
         area.insert(1.0,answer_text)
-
-    if str_v>0 and mul_or_sim==True:
-        if str_v==1.1234567890:
-            str_v=val.get()
-            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
-        else:
-            fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
-        area.insert(END,fraction_ans_text)
 
     # Important is v1,b1,b3,p1 
     # v1 = [Input], b1 = [Base], b3=[Base (already multiplied)], p1=[Power Decending Order]
@@ -528,7 +552,7 @@ def division(v,b,s_b):
         area.insert(END,fraction_ans_text)
 
 def fractional_multiply(v,b,s_b,answer):
-    global base_in_use,sec_base_in_use,non_numerical_hex,numerical_hex,hexadecimal
+    global base_in_use,sec_base_in_use,non_numerical_hex,numerical_hex,hexadecimal,ans_by_fraction_multiply
     iteration=4
 
     point_index = str(v).index('.')
@@ -586,6 +610,7 @@ def fractional_multiply(v,b,s_b,answer):
 
         summ=str(summ)[str(summ).index('.')+1::]
         languaged_format+=f'\n\tHence, ({v}){base_in_use} = ({answer}.{summ}){sec_base_in_use}'
+        ans_by_fraction_multiply=f"{answer}.{summ}"
         return languaged_format
 
     else:
