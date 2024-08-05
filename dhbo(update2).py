@@ -44,6 +44,7 @@ hex_or_oct=None
 mul_or_sim=None # mul=True & sim=False
 errorlevel=0
 str_v=0.0
+detect_hexoct=False
 
 # Setting Variables
 value.set('110011')
@@ -69,7 +70,7 @@ def empty():
     Label(text="",bg="white").pack()
 
 def identify():
-    global value,hex_or_oct,val,errorlevel,mul_or_sim,str_v
+    global value,hex_or_oct,val,errorlevel,mul_or_sim,str_v,detect_hexoct
     errorlevel=0
     if dhbo1.get() == "D1":
         if dhbo2.get() == "B2":
@@ -130,9 +131,11 @@ def identify():
                 base_checker(16,10)
                 multiply(val.get(),16,10)
             elif dhbo2.get() == "O2":
+                detect_hexoct=True
                 mul_or_sim=True
                 base_checker(16,10)
                 multiply(val.get(),16,10)
+                detect_hexoct=False
         else:
             tmsg.showerror("Error","Hexadecimal values can only contain digits (0-9) and letters (A-F)")
 
@@ -165,9 +168,11 @@ def identify():
                 str_v=0.0
                 hex_or_oct=None
             elif dhbo2.get() == "H2": # Correct
+                detect_hexoct=True
                 mul_or_sim=True
                 base_checker(8,10)
                 multiply(value.get(),8,10)
+                detect_hexoct=False
 
     else:
         tmsg.showerror('Error','Invalid Options Selected')
@@ -273,9 +278,9 @@ def multiply(v,b,s_b):
     h_text = 'To convert Hexadecimal to Octal, We first need to convert Hexa into Decimal,\n'
     o_text="To convert Octal to Hexadecimal, We first need to convert Octal into Decimal,\n"
 
-    rare_condition=((dhbo1.get()!="O1" and dhbo2.get()!="H2") and (dhbo1.get()!="H1" and dhbo2.get()!="O2"))
+    # rare_condition=((dhbo1.get()!="O1" and dhbo2.get()!="H2") and (dhbo1.get()!="H1" and dhbo2.get()!="O2"))
 
-    if str_v>0 and mul_or_sim==True and rare_condition:
+    if str_v>0 and mul_or_sim==True and detect_hexoct==False:
         if str_v==1.1234567890:
             str_v=val.get()
             fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
@@ -289,7 +294,7 @@ def multiply(v,b,s_b):
     else:
         fraction_ans_text=''
 
-    if str_v>0 and mul_or_sim==True and rare_condition==False:
+    if str_v>0 and mul_or_sim==True and detect_hexoct==True:
         if str_v==1.1234567890:
             str_v=val.get()
             fraction_ans_text = (fractional_multiply(str_v,b,s_b,f1))
