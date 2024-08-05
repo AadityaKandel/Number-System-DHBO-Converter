@@ -40,11 +40,14 @@ bits=0
 binary_for_octal = ['000','001','010','011','100','101','110','111']
 octal_not = ['8','9']
 binary_not = ['2','3','4','5','6','7','8','9']
+total_num = numerical_hex+non_numerical_hex+['.']
 hex_or_oct=None
 mul_or_sim=None # mul=True & sim=False
 errorlevel=0
 str_v=0.0
 detect_hexoct=False
+binary_not+=non_numerical_hex
+octal_not+=non_numerical_hex
 
 # Setting Variables
 value.set('110011')
@@ -57,17 +60,44 @@ def frm():
     frame = Frame(borderwidth=10,bg="white")
     return frame
 
+def convert_to_uppercase(event):
+    current_text = en1.get()
+    uppercase_text = current_text.upper()
+    en1.delete(0, END)
+    en1.insert(0, uppercase_text)
+
 def tick(frame_name,text,valuee):
-    checkbutton = Radiobutton(frame_name,text=text,bg="white",fg="black",font="Arial 10 bold",value=valuee)
+    checkbutton = Radiobutton(frame_name,text=text,bg="white",fg="black",font="Arial 10 bold",value=valuee,indicatoron=False,padx=12,pady=4)
     if valuee[-1] == "2":
         checkbutton.config(variable=dhbo2)
     else:
         checkbutton.config(variable=dhbo1)
     checkbutton.pack()
+    empty(frame_name)
     return checkbutton
 
-def empty():
-    Label(text="",bg="white").pack()
+def empty(frame_name):
+    Label(frame_name,text="",bg="white").pack()
+
+def check_before_identify():
+    if en1.get() =="":
+        return tmsg.showerror('Error','Input cannot be empty')
+    check_errors=0
+    check_intentional_errors=0
+    for x in en1.get():
+        if x=='.':
+            check_errors+=1
+            xindex=en1.get().index(x)
+    try:
+        if en1.get()[-1] == en1.get()[xindex]:
+            return tmsg.showerror("Error","Please Don't Do Any Intentional Mistakes")
+    except:
+        pass
+    rare_situation=(check_errors==1 or check_errors==0)
+    if all(values in total_num for values in en1.get()) and rare_situation:
+        identify()
+    else:
+        tmsg.showerror("Error",'Invalid Input')
 
 def identify():
     global value,hex_or_oct,val,errorlevel,mul_or_sim,str_v,detect_hexoct
@@ -835,14 +865,15 @@ l2 = Label(root, text="Enter your number below...", bg="white", fg="black", font
 l2.pack()
 
 en1 = Entry(textvariable=value, width=14, font=("Times New Roman", 14, "italic"), bg="white", fg="black")
+en1.bind('<KeyRelease>', convert_to_uppercase)
 en1.pack()
 
-empty()
+empty(root)
 
-btn = Button(text="Calculate",font=("Times New Roman", 14, "italic"), bg="black", fg="white",command=identify)
+btn = Button(text="Calculate",font=("Times New Roman", 14, "italic"), bg="black", fg="white",command=check_before_identify)
 btn.pack()
 
-empty()
+empty(root)
 
 area = Text(height=20,width=70, wrap=NONE,font=('Times New Roman',14,"bold"))
 
@@ -862,6 +893,7 @@ area.config(xscrollcommand=scrollbar1.set)
 radiobuttons = [ch1,ch2,ch4]
 for x in radiobuttons:
     x.config(command=non_exception)
+
 
 # Configuration
 root.config(bg="white")
